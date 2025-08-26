@@ -31,12 +31,11 @@ ASK FOR THE ISSUE (after ID is captured):
 - Be robust to variations in language and typos. Recognize any of the following as Internet/Wi-Fi/mobile data issues, even if phrased loosely: slow internet, buffering, lag, high ping, pages or videos not loading, Wi-Fi/WiFi/wi fi, disconnects/drops, can’t connect, hotspot/tethering, LTE/4G/5G, router/modem problems, signal/coverage, bandwidth/speed problems.
 
 TROUBLESHOOTING (provide the EXACT text below whenever the user asks about Wi-Fi / slow internet / mobile internet issues):
-"Sure, I can help you with a solution for slow mobile internet.
+"Sure, I can help you with a solution for internet issue.
 
-Here is a step by step guide to troubleshoot Home and Mobile WiFi issuez:
+Here is a step by step guide to troubleshoot Home or Mobile WiFi issues:
 
-Steps for Mobile WiFi issue:
-
+Steps for Mobile WiFi issues:
 Restart your phone
 o\tPower off the device, wait 10 seconds, and turn it back on.
 Forget and reconnect to the WiFi network
@@ -46,16 +45,13 @@ Check data balance (if using cellular hotspot)
 o\tEnsure your data plan allows hotspot usage.
 o\tSome carriers throttle hotspot speeds or restrict access after usage limits.
 
-Steps for Home WiFi issue:
-
+Steps for Home WiFi issues:
 Forget the network and reconnect
 o\t	Go to your device's WiFi settings, click the network name, and choose “Forget”
 o\t	Then reconnect and re-enter the password.
 Check router lights
 o\t	Make sure Power, Internet, and WiFi lights are steady.
 o\t	A blinking or red light may indicate an ISP issue.
-
-
 ”
 
 AFTER THE STEPS:
@@ -99,22 +95,33 @@ END_TOKEN = "[END_OF_CHAT]"
 # =========================
 # HELPERS
 # =========================
+def _compact_newlines(text: str) -> str:
+    # normalize newlines
+    t = text.replace("\r\n", "\n").replace("\r", "\n")
+    # drop whitespace-only lines
+    t = re.sub(r"[ \t]+\n", "\n", t)
+    # collapse 3+ consecutive line breaks to just one blank line
+    t = re.sub(r"\n{3,}", "\n\n", t)
+    return t.strip()
 
 # ---- Colored chat bubbles (helper) ----
 def render_bubble(role: str, text: str):
-    # Colors: tweak to taste
+    # Colors
     if role == "assistant":
         label = "Assistant"
-        bg = "#E8F5FF"     # light blue
+        bg = "#E8F5FF"   # light blue
         border = "#B3E0FF"
-        justify = "flex-start"   # left
+        justify = "flex-start"
     else:
         label = "You"
-        bg = "#FFF4E5"     # light orange
+        bg = "#FFF4E5"   # light orange
         border = "#FFD8A8"
-        justify = "flex-end"     # right
+        justify = "flex-end"
 
-    # NOTE: If you expect HTML in messages, escape it before injecting.
+    # Compact spacing and escape HTML
+    compact = _compact_newlines(text)
+    safe = html.escape(compact).replace("\n", "<br>")
+
     st.markdown(
         f"""
         <div style="display:flex; justify-content:{justify}; margin:6px 0;">
@@ -124,10 +131,9 @@ def render_bubble(role: str, text: str):
               background: {bg};
               border: 1px solid {border};
               border-radius: 14px;
-              line-height: 1.45;
-              white-space: pre-wrap;
-              word-wrap: break-word;">
-            <strong>{label}:</strong><br>{text}
+              line-height: 1.35;
+              white-space: normal;">
+            <strong>{label}:</strong><br>{safe}
           </div>
         </div>
         """,
