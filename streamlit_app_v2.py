@@ -4,6 +4,7 @@ from uuid import uuid4          # <-- add this line
 from datetime import datetime
 import json, re
 import requests
+import html
 
 # ---- Secure client ----
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
